@@ -1,0 +1,7 @@
+function [ f0 B ] = fundamentals(audioFile, transcriptionMatrix)
+%FUNDAMENTALS Returns a 
+%   Detailed explanation goes here
+
+
+end
+
