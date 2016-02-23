@@ -23,7 +23,7 @@ num_frames = floor((file_length - window_length)/jump_size);
 frame_index = [0:1:num_frames-1] * jump_size;
 n = [0:file_length-1] / Fs;
 
-threshold = 0.5;
+threshold = 1/1760; % approx lowest not expected.
 
 tau_0 = nan(num_frames, 1);
 
@@ -48,7 +48,7 @@ for frame = floor((6 * Fs)/jump_size) : floor((6 * Fs)/jump_size) + 100
     
     for tau = 1:window_length
         
-        if d_norm(tau) <= 0.5 && d_norm(tau) < d_norm(tau - 1) && d_norm(tau) < d_norm(tau + 1);
+        if (tau/Fs) > threshold && d_norm(tau) < d_norm(tau - 1) && d_norm(tau) < d_norm(tau + 1);
             tau_0(frame+1) = tau;
             break;
         end
@@ -60,4 +60,4 @@ end
 
 plot(tau_0)
 
-soundsc(input(frame_index(floor((6 * Fs)/jump_size)):frame_index(floor((6 * Fs)/jump_size)+100)));
+soundsc(input(frame_index(floor((6 * Fs)/jump_size)):frame_index(floor((6 * Fs)/jump_size)+100)), Fs);
