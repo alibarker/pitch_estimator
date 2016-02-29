@@ -4,9 +4,11 @@
 close all;
 clear all;
 audioFile = 'bach_pr1_a.wav';
-
+bach_pr1;
 
 [input Fs] = audioread(audioFile);
+file_start = 5 * Fs;
+file_end = 140 * Fs
 
 % mono sum audio file
 channels = size(input, 2);
@@ -16,48 +18,18 @@ if channels > 1
 end
 
 file_length = length(input);
-window_length = 0.05 * Fs;
-jump_size = floor(0.5 * window_length);
-num_frames = floor((file_length - window_length)/jump_size);
+windowlength = 100/1000*Fs;
+jump_size = floor(0.5 * windowlength);
+num_frames = floor((file_length - windowlength)/jump_size);
 
 frame_index = [0:1:num_frames-1] * jump_size;
 n = [0:file_length-1] / Fs;
 
-threshold = 1/1760; % approx lowest not expected.
+[S,F,T] = spectrogram(input(file_start:file_end), hann(ceil(windowlength)), ...
+    ceil(windowlength/2), 16384, Fs);
 
-tau_0 = nan(num_frames, 1);
 
-for frame = floor((6 * Fs)/jump_size) : floor((6 * Fs)/jump_size) + 100
-       
-    d = zeros(window_length, 1);
-    d_norm = d;
-    window_start = frame * jump_size + 1;
-    window_end = window_start + window_length;
-    
-    for tau = 1: window_length
-        for t = 0 : window_length - tau - 1
-            d(tau) = d(tau) + (input(window_start + t) - input(window_start + t+tau))^2;
-        end
-        dt = 0;
-        for t = 1:tau
-           dt = dt + sum(d(t));
-        end
-         d_norm(tau) = d(tau) * tau / dt;
-                  
-    end
-    
-    for tau = 1:window_length
-        
-        if (tau/Fs) > threshold && d_norm(tau) < d_norm(tau - 1) && d_norm(tau) < d_norm(tau + 1);
-            tau_0(frame+1) = tau;
-            break;
-        end
-        
-    end
-   
-    
-end
 
-plot(tau_0)
 
-soundsc(input(frame_index(floor((6 * Fs)/jump_size)):frame_index(floor((6 * Fs)/jump_size)+100)), Fs);
+imagesc(T, F, abs(S))
+axis xy;
